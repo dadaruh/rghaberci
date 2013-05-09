@@ -1,27 +1,34 @@
 <?php
 
-function DBConnect()
-{
+function DBConnect(){
+	
 	$con=mysql_connect(DBHOST,DBUSER,DBPASS);
 	mysql_select_db(DBNAME);
 	mysql_set_charset("utf8");	
 }
 
-function DBClose()
-{
+function DBClose(){
+	
 	mysql_close();
 }
 
-function DBGetKeywords()
-{
+function DBGetKeywords(){
+	
 	$result=mysql_query("Select * from keywords");
 	
 	if($result)	return DBGetRows($result); 
 	else return false;	
 }
 
-function DBSaveResult($keywordId,$matchTxt,$index)
-{
+function DBGetKeywordsByGroup($kwGroup){
+		
+	$result=mysql_query("Select id from keywords where kwgroup='$kwGroup'");
+	
+	if($result)	return DBGetRows($result); 
+	else return false;	
+}
+
+function DBSaveResult($keywordId,$matchTxt,$index){
 	//Save if match is not recorded
 	if(!DBCheckResult($keywordId,$index))
 	{
@@ -31,19 +38,10 @@ function DBSaveResult($keywordId,$matchTxt,$index)
 	}
 }
 
-function DBSendResult()
-{
-
+function DBSendResult(){
+	
 
 //TODO+Log Email	
-}
-
-function DBGetRows($result){
-	$rows=array();
-	while ($row=mysql_fetch_assoc($result))
-		array_push($rows,$row);
-	
-	return $rows;
 }
 
 function DBCheckResult($keywordId,$index){
@@ -54,6 +52,37 @@ function DBCheckResult($keywordId,$index){
 	else 
 		return false;
 }	
+
+function DBGetPersonKeywords(){
+	$query="Select * from person p";
+	$result=mysql_query($query);
+	$personArr=DBGetRows($result);
+	$personKeywordArr=array();
+	foreach($personArr as $person){
+		$person['kw']=DBGetKeywordsByGroup($person['kwgroup']);
+		$personKeywordArr[]=$person;
+	}
+	return $personKeywordArr;
+}
+
+function DBGetResultbyKw($kwId){
+	$today=date('Y-m-d'); 
+	$query="Select * from results where keywordid=$kwId and date='$today'";
+	$qResult=mysql_query($query);
+	if(mysql_num_rows($qResult)>0)
+		return DBGetRows($qResult);
+	else return 0;
+}
+
+
+
+function DBGetRows($result){
+	$rows=array();
+	while ($row=mysql_fetch_assoc($result))
+		array_push($rows,$row);
+	
+	return $rows;
+}
 
 
 ?>
