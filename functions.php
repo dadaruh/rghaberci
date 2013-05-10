@@ -35,7 +35,7 @@ $keywordArr = DBGetKeywords();
 
 function getResmiGazetePDF(){
 	
-	global $link;
+	global $link, $fileName;
 	if(!file_exists(RGDIR.$fileName)){
 		shell_exec('wget '.$link.' -P '.RGDIR);
 	}
