@@ -38,11 +38,6 @@ function DBSaveResult($keywordId,$matchTxt,$index){
 	}
 }
 
-function DBSendResult(){
-	
-
-//TODO+Log Email	
-}
 
 function DBCheckResult($keywordId,$index){
 	$date=date('Y-m-d');
