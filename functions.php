@@ -1,8 +1,10 @@
 <?php
 
 function pdfSaveSearch(){
-
+	
 $filePath=getResmiGazetePDF();
+if($filePath == false) die(); //Today is sunday, no RG!
+
 $content = shell_exec('pdftotext '.$filePath.' -');
 
 $keywordArr = DBGetKeywords();
@@ -39,8 +41,10 @@ function getResmiGazetePDF(){
 	if(!file_exists(RGDIR.$fileName)){
 		shell_exec('wget '.$link.' -P '.RGDIR);
 	}
-
-	return RGDIR.$fileName;
+	if(file_exists(RGDIR.$fileName))
+		return RGDIR.$fileName;
+	else 
+		return false;
 }
 
 function sendMail(){
@@ -57,12 +61,15 @@ function sendMail(){
 				$results=array_merge($results,$kwResult);
 			}
 		}
+		if(isset($results)) continue;
 		
 		$mailBody=formatText($results);
 		$today=date('d.m.Y');
 		$subject=$today.' tarihli Resmi Gazete Habercisi';
-		$headers='From: '.FROM."\r\n" .
-    		'Reply-To: '.REPLYTO."\r\n";
+		$headers='From: '.FROM."\r\n" 
+    		.'Reply-To: '.REPLYTO."\r\n"
+			.'Content-type: text/html\r\n'
+			."MIME-Version: 1.0\r\n";
 		
 		mail($pKeyword['email'],$subject,$mailBody,$headers);
 	}

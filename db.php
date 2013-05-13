@@ -24,7 +24,7 @@ function DBGetKeywordsByGroup($kwGroup){
 		
 	$result=mysql_query("Select id from keywords where kwgroup='$kwGroup'");
 	
-	if($result)	return DBGetRows($result); 
+	if(mysql_num_rows($result)>0) return DBGetRows($result); 
 	else return false;	
 }
 
