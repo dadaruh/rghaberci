@@ -5,7 +5,14 @@ function pdfSaveSearch(){
 $filePath=getResmiGazetePDF();
 if($filePath == false) die(); //Today is sunday, no RG!
 
-$content = shell_exec('pdftotext '.$filePath.' -');
+include("class.pdf2text.php");
+
+$a = new PDF2Text();
+$a->setFilename($filePath);
+$a->setUnicode(true);
+$a->decodePDF();
+
+$content = $a->output(); 
 
 $keywordArr = DBGetKeywords();
 
@@ -32,6 +39,7 @@ $keywordArr = DBGetKeywords();
 	
 			$i++;
 		}
+		echo $i." results saved<br>";
 	}
 }
 
@@ -73,6 +81,7 @@ function sendMail(){
 		
 		mail($pKeyword['email'],$subject,$mailBody,$headers);
 	}
+	echo "mail send completed<br>";
 }
 
 function formatText($results){
@@ -93,6 +102,7 @@ function getTemplate($resultText){
 	$today=date('d.m.Y');
 	$template=file_get_contents(TEMPLATE);
 	$template=str_replace(array("##today##","##rglink##","##resulttext##"), array($today,$link,$resultText), $template);
+	echo "we have the template<br>";
 	return $template;
 }
 
